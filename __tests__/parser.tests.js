@@ -34,7 +34,6 @@ describe('Basic functionality', ()=> {
 
    test('returns an array of statements', ()=> {
       let res = parse("import Tv\nimport Player")
-      console.log(res)
       expect(res).toBeInstanceOf(Array)
       expect(res).toHaveLength(2)
    })
@@ -49,9 +48,71 @@ describe('Basic functionality', ()=> {
 describe('Basic statement types', ()=> {
    test('produces log statements', ()=> {
       let res = parse('log "Hi!"')
-      , import_stmt = res[0]
-      expect(import_stmt).toHaveProperty('type', 'log')
-      expect(import_stmt).toHaveProperty('payload')
-      expect(import_stmt.payload).toHaveProperty('string', "Hi!")
+      , log_stmt = res[0]
+      expect(log_stmt).toHaveProperty('type', 'log')
+      expect(log_stmt).toHaveProperty('payload')
+      expect(log_stmt.payload).toHaveProperty('string', "Hi!")
+   })
+
+   test('produces an expression-statement', ()=> {
+      let res = parse('2 + 2')
+      , expr_stmt = res[0]
+      expect(expr_stmt).toHaveProperty('type', 'expression')
+      expect(expr_stmt.contents).toBeDefined()
+   })
+})
+
+describe('Basic expression types', ()=> {
+   test('produces numbers', ()=> {
+      let res = parse('2')
+      , expr_stmt = res[0]
+      expect(expr_stmt).toHaveProperty('type', 'expression')
+      expect(expr_stmt).toHaveProperty('contents')
+      expect(expr_stmt.contents).toHaveProperty('type', 'number')
+      expect(expr_stmt.contents).toHaveProperty('payload', '2')
+   })
+
+   test('produces infix addition', ()=> {
+      let res = parse('2 + 2')
+      , expr_stmt = res[0]
+      , infix = expr_stmt.contents
+      expect(infix).toHaveProperty('type', 'infix')
+      expect(infix).toHaveProperty('payload', {op: '+'})
+   })
+
+   test('produces infix subtraction', ()=> {
+      let res = parse('2 - 2')
+      , expr_stmt = res[0]
+      , infix = expr_stmt.contents
+      expect(infix).toHaveProperty('type', 'infix')
+      expect(infix).toHaveProperty('payload', {op: '-'})
+   })
+
+   test('produces infix multiplication', ()=> {
+      let res = parse('2 * 2')
+      , expr_stmt = res[0]
+      , infix = expr_stmt.contents
+      expect(infix).toHaveProperty('type', 'infix')
+      expect(infix).toHaveProperty('payload', {op: '*'})
+   })
+
+   test('produces infix division', ()=> {
+      let res = parse('2 / 2')
+      , expr_stmt = res[0]
+      , infix = expr_stmt.contents
+      expect(infix).toHaveProperty('type', 'infix')
+      expect(infix).toHaveProperty('payload', {op: '/'})
+   })
+
+   test('produces infix math associatively', ()=> {
+      let res = parse('2 + 2 / 4')
+      , expr_stmt = res[0]
+      , parent = expr_stmt.contents
+      expect(parent).toHaveProperty('type', 'infix')
+      expect(parent).toHaveProperty('payload', {op: '+'})
+      expect(parent).toHaveProperty('contents')
+      expect(child).toHaveProperty('type', 'infix')
+      expect(child).toHaveProperty('payload', {op: '/'})
+      expect(child).not.toHaveProperty('contents')
    })
 })
