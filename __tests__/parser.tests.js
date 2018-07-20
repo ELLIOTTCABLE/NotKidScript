@@ -17,29 +17,41 @@ const parse = function(str){
    return parser.results[0]
 }
 
-test('handles an import statement', ()=> {
-   expect(()=> parse("import Tv")).not.toThrow()
+describe('Basic functionality', ()=> {
+   test('handles a simple import statement', ()=> {
+      expect(()=> parse("import Tv")).not.toThrow()
+   })
+
+   test('handles multiple (import) statements', ()=> {
+      expect(()=> parse("import Tv\nimport Player")).not.toThrow()
+   })
+
+   test('returns an array for one statement', ()=> {
+      let res = parse("import Tv")
+      expect(res).toBeInstanceOf(Array)
+      expect(res).toHaveLength(1)
+   })
+
+   test('returns an array of statements', ()=> {
+      let res = parse("import Tv\nimport Player")
+      console.log(res)
+      expect(res).toBeInstanceOf(Array)
+      expect(res).toHaveLength(2)
+   })
+
+   test('produces an node-Object for each statement', ()=> {
+      let res = parse("import Tv")
+      , import_stmt = res[0]
+      expect(import_stmt).toHaveProperty('type', 'import')
+   })
 })
 
-test('handles multiple statements', ()=> {
-   expect(()=> parse("import Tv\nimport Player")).not.toThrow()
+describe('Basic statement types', ()=> {
+   test('produces log statements', ()=> {
+      let res = parse('log "Hi!"')
+      , import_stmt = res[0]
+      expect(import_stmt).toHaveProperty('type', 'log')
+      expect(import_stmt).toHaveProperty('payload')
+      expect(import_stmt.payload).toHaveProperty('string', "Hi!")
+   })
 })
-
-test('returns an array for one statement', ()=> {
-   let res = parse("import Tv")
-   expect(res).toBeInstanceOf(Array)
-   expect(res).toHaveLength(1)
-})
-
-test('returns an array of statements', ()=> {
-   let res = parse("import Tv\nimport Player")
-   expect(res).toBeInstanceOf(Array)
-   expect(res).toHaveLength(2)
-})
-
-test('produces an node-Object for each statement', ()=> {
-   let res = parse("import Tv")
-     , import_stmt = res[0]
-   expect(import_stmt).toHaveProperty('type', 'import')
-})
-
