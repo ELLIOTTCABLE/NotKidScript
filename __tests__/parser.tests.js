@@ -110,9 +110,8 @@ describe('Basic expression types', ()=> {
       , parent = expr_stmt.contents
       expect(parent).toHaveProperty('type', 'infix')
       expect(parent).toHaveProperty('payload', {op: '+'})
-      expect(parent).toHaveProperty('contents')
-      expect(child).toHaveProperty('type', 'infix')
-      expect(child).toHaveProperty('payload', {op: '/'})
-      expect(child).not.toHaveProperty('contents')
+      expect(parent).toHaveProperty('contents.rhs')
+      expect(parent.contents.rhs).toHaveProperty('type', 'infix')
+      expect(parent.contents.rhs).toHaveProperty('payload', {op: '/'})
    })
 })
