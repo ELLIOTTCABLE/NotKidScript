@@ -53,7 +53,6 @@ body -> statements {% id %}
 
 expression ->
    infix                      {% id %}
- | delimited_expr             {% id %}
 
 delimited_expr ->
    parenthesized_expression   {% id %}
