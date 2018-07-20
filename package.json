@@ -18,10 +18,16 @@
   },
   "devDependencies": {
     "jest": "^23.4.1",
-    "nodemon": "^1.18.3"
+    "nodemon": "^1.18.3",
+    "unindent": "^2.0.0"
   },
   "jest": {
     "collectCoverage": true,
-    "coverageReporters": ["json", "lcov", "text", "html"]
+    "coverageReporters": [
+      "json",
+      "lcov",
+      "text",
+      "html"
+    ]
   }
 }

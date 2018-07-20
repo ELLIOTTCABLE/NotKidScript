@@ -11,7 +11,7 @@
    }
 
    const infix = ([lhs, _ls, [op], _rs, rhs]) =>
-      $('infix', {'op': op.value}, [lhs, rhs])
+      $('infix', {'op': op.value}, {lhs, rhs})
 %}
 
 @lexer lexer
@@ -23,11 +23,12 @@ statements     ->
    statement:+                {% id %}
  | statement:* last_statement {% ([stmts, last]) => _.concat(stmts, last) %}
 
-statement      -> statement_body comment? nl {% ([stmt, _comm, _nl]) => stmt %}
-last_statement -> statement_body comment?    {% ([stmt, _comm]) => stmt %}
+statement      -> _ statement_body comment? nl {% ([_s, stmt, _comm, _nl]) => stmt %}
+last_statement -> _ statement_body comment?    {% ([_s, stmt, _comm]) => stmt %}
 statement_body ->
    import_stmt {% id %}
  | log_stmt    {% id %}
+ | if_stmt     {% id %}
  | expr_stmt   {% id %}
 
 import_stmt -> %Kimport __ %module  {% ([kw, _, name]) =>
@@ -35,8 +36,19 @@ import_stmt -> %Kimport __ %module  {% ([kw, _, name]) =>
 log_stmt    -> %Klog _ %string      {% ([kw, _, string]) =>
                   $('log', {string: string.value}) %}
 
+if_stmt     ->
+   %Kif _ parenthesized_expression nl body nl _ %Kend
+   {% ([_lkw, _ls, predicate, _lnl, body, _rnl, _rs, _rkw]) =>
+      $('if', null, {predicate, body}) %}
+ | %Kif __ expression nl body nl _ %Kend
+   {% ([_lkw, _ls, predicate, _lnl, body, _rnl, _rs, _rkw]) =>
+      $('if', null, {predicate, body}) %}
+
 expr_stmt   -> expression           {% ([expr]) =>
                   $('expression', null, expr) %}
+
+
+body -> statements {% id %}
 
 
 expression ->
@@ -56,12 +68,12 @@ product ->
 
 exp ->
    %number _ %exp _ exp          {% infix %}
- | %number                       {% ([num]) => $('number', '2') %}
+ | %number                       {% ([num]) => $('number', num.value) %}
 
 
 comment? -> _ %comment:? {% ()=> null %}
 
-nl -> %NL {% ()=> null %}
+nl -> _ %NL {% ()=> null %}
 
 _  -> %S:* {% ()=> null %}
 __ -> %S:+ {% ()=> null %}

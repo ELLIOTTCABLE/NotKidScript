@@ -1,9 +1,14 @@
 const assert  = require('assert')
+    , unindent = require('unindent')
     , nearley = require('nearley')
 
 const lexer   = require('../lib/lexer.js')
     , grammar = require('../lib/grammar.js')
     , compiled = nearley.Grammar.fromCompiled(grammar)
+
+const prog = function(str){
+   return unindent(str, {trim: true})
+}
 
 const parse = function(str){
    const parser = new nearley.Parser(compiled)
@@ -59,6 +64,24 @@ describe('Basic statement types', ()=> {
       , expr_stmt = res[0]
       expect(expr_stmt).toHaveProperty('type', 'expression')
       expect(expr_stmt.contents).toBeDefined()
+   })
+})
+
+describe('Complex statement types', ()=> {
+   test('produces if-blocks', ()=> {
+      let res = parse(prog(`
+      if 1
+         log "Hello, world!"
+      end
+      `))
+      , if_stmt = res[0]
+      expect(if_stmt).toHaveProperty('type', 'if')
+      expect(if_stmt).toHaveProperty('contents')
+      expect(if_stmt.contents).toHaveProperty('predicate')
+      expect(if_stmt.contents.predicate).toHaveProperty('payload', '1')
+      expect(if_stmt.contents).toHaveProperty('body')
+      expect(if_stmt.contents.body).toBeInstanceOf(Array)
+      expect(if_stmt.contents.body).toHaveLength(1)
    })
 })
 
