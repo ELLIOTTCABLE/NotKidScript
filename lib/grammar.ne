@@ -52,12 +52,16 @@ body -> statements {% id %}
 
 
 expression ->
-   math {% id %}
- | parenthesized_expression {% id %}
+   infix                      {% id %}
+ | delimited_expr             {% id %}
+
+delimited_expr ->
+   parenthesized_expression   {% id %}
+ | %number                    {% ([num]) => $('number', num.value) %}
 
 parenthesized_expression -> %lparen _ expression _ %rparen {% ([_lp,_ls, expr, _rs,_rp]) => expr %}
 
-math -> sum                {% id %}
+infix -> sum                     {% id %}
 sum ->
    sum _ (%add|%sub) _ product   {% infix %}
  | product                       {% id %}
@@ -67,8 +71,8 @@ product ->
  | exp                           {% id %}
 
 exp ->
-   %number _ %exp _ exp          {% infix %}
- | %number                       {% ([num]) => $('number', num.value) %}
+   delimited_expr _ (%exp) _ exp {% infix %}
+ | delimited_expr                {% id %}
 
 
 comment? -> _ %comment:? {% ()=> null %}

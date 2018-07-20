@@ -137,4 +137,15 @@ describe('Basic expression types', ()=> {
       expect(parent.contents.rhs).toHaveProperty('type', 'infix')
       expect(parent.contents.rhs).toHaveProperty('payload', {op: '/'})
    })
+
+   test('produces parenthesized expressions', ()=> {
+      let res = parse('(2 + 2) / 4')
+      , expr_stmt = res[0]
+      , parent = expr_stmt.contents
+      expect(parent).toHaveProperty('type', 'infix')
+      expect(parent).toHaveProperty('payload', {op: '/'})
+      expect(parent).toHaveProperty('contents.lhs')
+      expect(parent.contents.lhs).toHaveProperty('type', 'infix')
+      expect(parent.contents.lhs).toHaveProperty('payload', {op: '+'})
+   })
 })
